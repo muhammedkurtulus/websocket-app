@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { json } from "stream/consumers";
+import io from 'socket.io-client';
 
 interface MemoryUsage {
   rss: number;
@@ -16,27 +16,51 @@ export default function Home() {
   const [message, setMessage] = useState<MemoryUsage>()
 
   useEffect(() => {
-    const protocol = window.location.protocol.includes('https') ? 'wss' : 'ws';
-    const ws = new WebSocket(`${protocol}://localhost:8080`);
+    //ws-------------------------------- 
 
-    ws.onopen = () => {
+    // const protocol = window.location.protocol.includes('https') ? 'wss' : 'ws';
+    // const ws = new WebSocket(`${protocol}://localhost:8080`);
+
+    // ws.onopen = () => {
+    //   console.log("Connected to WebSocket server");
+    // };
+
+    // ws.onmessage = (event) => {
+    //   // Handle incoming messages
+    //   const msg = JSON.parse(event.data)
+    //   setMessage(msg)
+    //   // console.log("Received:", event.data);
+    //   // console.log("rss:", msg.rss);
+    // };
+
+    // ws.onclose = () => {
+    //   console.log("Disconnected from WebSocket server");
+    // };
+
+
+    //Socket.io--------------------------------
+
+    const socket = io('http://localhost:8080');
+
+    socket.on('connect', () => {
       console.log("Connected to WebSocket server");
-    };
+    });
 
-    ws.onmessage = (event) => {
-      // Handle incoming messages
-      const msg = JSON.parse(event.data)
-      setMessage(msg)
-      // console.log("Received:", event.data);
-      // console.log("rss:", msg.rss);
-    };
+    socket.on('message', (data) => {
+      const msg = JSON.parse(data)
+      setMessage(msg);
+      console.log(data);
 
-    ws.onclose = () => {
+      // setMessage(data);
+    });
+
+    socket.on('disconnect', () => {
       console.log("Disconnected from WebSocket server");
-    };
+    });
 
     return () => {
-      ws.close();
+      // ws.close();
+      socket.disconnect();
     };
 
   }, []);
