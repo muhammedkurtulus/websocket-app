@@ -40,15 +40,17 @@ export default function Home() {
 
     //Socket.io--------------------------------
 
-    const socket = io('http://localhost:8080');
+    const socket = io('https://api.777senselabs.com', {
+      transports: ['websocket'],
+    });
 
     socket.on('connect', () => {
       console.log("Connected to WebSocket server");
     });
 
     socket.on('message', (data) => {
-      const msg = JSON.parse(data)
-      setMessage(msg);
+      // const msg = JSON.parse(data)
+      // setMessage(msg);
       console.log(data);
 
       // setMessage(data);
